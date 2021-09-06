@@ -6,10 +6,13 @@ import handleFiles from "../components/handleFiles"; // Handles the actually upl
 const Home: NextPage = () => {
   const [loadedFile, setLoadedFile] = useState<any>(false);
   const { imageType, data } = loadedFile;
-  
+
   const handleUpload = (e: any) => {
-    const { files } = e.target;
-    const file = files[0];
+    const {
+      target: {
+        files: [file],
+      },
+    } = e;
     file && handleFiles(file, setLoadedFile); // "file && ..." is to avoid code breaks when the user cancels the upload.
   };
 

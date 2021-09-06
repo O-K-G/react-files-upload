@@ -2,30 +2,36 @@ const handleFiles = (file: any, setLoadedFile: any) => {
   const reader: any = new FileReader();
   const { type } = file; // Add "const { name, size, type } = file"; if you need the filename or filesize.
 
+  // Allowed image file types.
+  const imageTypes = [
+    "image/png",
+    "image/svg+xml",
+    "image/jpeg",
+    "image/gif",
+    "image/bmp",
+  ];
+
+  const [png, svgXml, jpeg, gif, bmp] = imageTypes;
+
   // If the files are image files.
-  if (
-    type === "image/png" ||
-    type === "image/svg+xml" ||
-    type === "image/jpeg" ||
-    type === "image/gif" ||
-    type === "image/bmp"
-  ) {
+  if (imageTypes.includes(type)) {
     reader.readAsDataURL(file); // Convert the image file to a Base64 encoding.
 
     // Once the file is loaded.
     reader.onload = () => {
-      const { result } = reader;
+      const { result: data } = reader;
 
       // 'slice()' is mandatory to display image data URLs.
-      const data = result.slice(
-        (type === "image/png" && 22) ||
-          (type === "image/svg+xml" && 26) ||
-          (type === "image/jpeg" && 23) ||
-          (type === "image/gif" && 22) ||
-          (type === "image/bmp" && 22)
-      );
-
-      setLoadedFile({ imageType: type, data: data });
+      setLoadedFile({
+        imageType: type,
+        data: data.slice(
+          (type === png && 22) ||
+            (type === svgXml && 26) ||
+            (type === jpeg && 23) ||
+            (type === gif && 22) ||
+            (type === bmp && 22)
+        ),
+      });
     };
 
     // If the file isn't one of the approved file types above.
