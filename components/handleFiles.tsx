@@ -6,6 +6,7 @@ export const fileTypes = {
     "image/jpeg",
     "image/gif",
     "image/bmp",
+    "image/webp"
   ],
   documentFiles: ["application/pdf"],
 

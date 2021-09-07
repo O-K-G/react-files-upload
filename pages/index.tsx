@@ -38,7 +38,7 @@ const Home: NextPage = () => {
           type="file"
           id="file"
           name="contained-button-file"
-          accept=".png, .jpg, .jpeg, .gif, .bmp, .svg, .pdf, .tif, .doc, .docx, .odt" // Changing this field also requires updating '/components/handleFiles.tsx' accordingly.
+          accept=".png, .jpg, .jpeg, .gif, .bmp, .svg, .pdf, .tif, .webp, .doc, .docx, .odt" // Changing this field also requires updating '/components/handleFiles.tsx' accordingly.
           onChange={handleUpload}
         />
         <input type="submit" />
