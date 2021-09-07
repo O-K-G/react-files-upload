@@ -1,43 +1,29 @@
+// Allowed image file types.
+export const imageTypes = [
+  "image/png",
+  "image/svg+xml",
+  "image/jpeg",
+  "image/gif",
+  "image/bmp",
+];
+
+export const docTypes = ["application/pdf"];
+
 const handleFiles = (file: any, setLoadedFile: any) => {
-  const reader: any = new FileReader();
   const { type } = file; // Add "const { name, size, type } = file"; if you need the filename or filesize.
+  const blob = new Blob([file], { type: type });
+  const blobURL = URL.createObjectURL(blob);
 
-  // Allowed image file types.
-  const imageTypes = [
-    "image/png",
-    "image/svg+xml",
-    "image/jpeg",
-    "image/gif",
-    "image/bmp",
-  ];
-
-  const [png, svgXml, jpeg, gif, bmp] = imageTypes;
-
-  // If the files are image files.
-  if (imageTypes.includes(type)) {
-    reader.readAsDataURL(file); // Convert the image file to a Base64 encoding.
-
-    // Once the file is loaded.
-    reader.onload = () => {
-      const { result: data } = reader;
-
-      // 'slice()' is mandatory to display image data URLs.
-      setLoadedFile({
-        imageType: type,
-        data: data.slice(
-          (type === png && 22) ||
-            (type === svgXml && 26) ||
-            (type === jpeg && 23) ||
-            (type === gif && 22) ||
-            (type === bmp && 22)
-        ),
-      });
-    };
-
-    // If the file isn't one of the approved file types above.
+  if (imageTypes.includes(type) || docTypes.includes(type)) {
+    setLoadedFile({
+      type: type,
+      data: blobURL,
+    });
   } else {
     console.warn("Incorrect file type, please choose a correct file type.");
   }
 };
+
+//  Add 'URL.revokeObjectURL(blobURL);' at a stage when the object isn't needed anymore.
 
 export default handleFiles;
