@@ -5,39 +5,45 @@ import handleFiles, { fileTypes } from "../components/handleFiles"; // Handles t
 
 const Home: NextPage = () => {
   const [loadedFile, setLoadedFile] = useState<any>(false);
-  const { name, type, blob } = loadedFile;
+  const { name, type, blob, base64String } = loadedFile;
   const { imageFiles, documentFiles, unsupportedFiles } = fileTypes;
-
+const [t, setT] = useState(false);
   const handleUpload = (e: any) => {
     const {
       target: {
         files: [file],
       },
     } = e;
+
+    setT(file);
     file && handleFiles(file, setLoadedFile); // "file && ..." is to avoid code breaks when the user cancels the upload.
   };
 
   // Simulate a fake fetch().
   const fakeFetch = (e: any) => {
+    const file = e.target.fileInput.files[0];
+    
     e.preventDefault();
     const formData = new FormData();
     formData.append("firstName", "John");
-    formData.append(type, blob, name);
+    formData.append("file", file);
     console.log(formData.getAll("firstName"));
-    console.log(formData.getAll(type));
+    console.log(formData.getAll("file"));
+    console.log(base64String);
+    console.log(file);
   };
 
   // Add 'URL.revokeObjectURL(blobURL);' at a stage when the object isn't needed anymore.
 
   return (
     <>
-      <form id="formElement" onSubmit={fakeFetch}>
+      <form encType="multipart/form-data" id="formElement" onSubmit={fakeFetch}>
         <input type="text" name="firstName" value="Some Value" readOnly />
-        <label htmlFor="contained-button-file">Choose a file: </label>
+        <label htmlFor="fileInput">Choose a file: </label>
         <input
           type="file"
           id="file"
-          name="contained-button-file"
+          name="fileInput"
           accept=".png, .jpg, .jpeg, .gif, .bmp, .svg, .pdf, .tif, .webp, .doc, .docx, .odt" // Changing this field also requires updating '/components/handleFiles.tsx' accordingly.
           onChange={handleUpload}
         />
@@ -48,7 +54,7 @@ const Home: NextPage = () => {
         <Image
           width={300}
           height={200}
-          src={URL.createObjectURL(blob)}
+          src={URL.createObjectURL(t)}
           alt={"Some image"}
         />
       )}

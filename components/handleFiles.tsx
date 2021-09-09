@@ -6,7 +6,7 @@ export const fileTypes = {
     "image/jpeg",
     "image/gif",
     "image/bmp",
-    "image/webp"
+    "image/webp",
   ],
   documentFiles: ["application/pdf"],
 
@@ -20,15 +20,24 @@ const handleFiles = (file: any, setLoadedFile: any) => {
   const { imageFiles, documentFiles, unsupportedFiles } = fileTypes;
   const fileExtension = name.split(".").pop(); // Used for unsupported file extensions.
 
-  imageFiles.includes(type) ||
-  documentFiles.includes(type) ||
-  unsupportedFiles.includes(fileExtension)
-    ? setLoadedFile({
-        name: name,
-        type: type ? type : fileExtension,
-        blob: blob,
-      })
-    : console.warn("Incorrect file type, please choose a correct file type.");
+  // Start of Base64 converstion.
+  const reader: any = new FileReader();
+  reader.readAsDataURL(file); // Convert the file to a Base64 encoding.
+  reader.onload = () => {
+    const { result } = reader;
+    // End of Base64 converstion.
+
+    imageFiles.includes(type) ||
+    documentFiles.includes(type) ||
+    unsupportedFiles.includes(fileExtension)
+      ? setLoadedFile({
+          name: name,
+          type: type ? type : fileExtension,
+          blob: blob,
+          base64String: result.split(",").pop(), // Removes the base64 header.
+        })
+      : console.warn("Incorrect file type, please choose a correct file type.");
+  };
 };
 
 export default handleFiles;
