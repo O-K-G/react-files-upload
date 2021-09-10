@@ -22,10 +22,10 @@ const handleFiles = (file: any, setLoadedFile: any) => {
   imageFiles.includes(type) ||
   documentFiles.includes(type) ||
   unsupportedFiles.includes(fileExtension)
-    ? setLoadedFile({
-        fileObject: file,
-        type: type ? type : fileExtension,
-      })
+    ? setLoadedFile((prevValue: any) => [
+          ...prevValue,
+        { fileObject: file, type: type ? type : fileExtension },
+      ])
     : console.warn("Incorrect file type, please choose a correct file type.");
 };
 
@@ -49,6 +49,10 @@ const convertFetch = (fileObject: any) => {
     console.log(formData.getAll("file"));
   };
   console.log(formData.getAll("firstName"));
+
+  reader.onerror = () => {
+    console.error("Failed to read file!");
+  };
 
   URL.revokeObjectURL(fileObject); // Needed once the URL object isn't needed anymore. For cleanup purposes.
 };

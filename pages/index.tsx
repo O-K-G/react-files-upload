@@ -7,30 +7,31 @@ import handleFiles, {
 } from "../components/handleFiles"; // Handles the actually uploaded files.
 
 const Home: NextPage = () => {
-  const [loadedFile, setLoadedFile] = useState<any>(false);
-  const { fileObject, type } = loadedFile;
+  const [loadedFiles, setLoadedFiles] = useState<any>([]);
   const { imageFiles, documentFiles, unsupportedFiles } = fileTypes;
 
   const handleUpload = (e: any) => {
-    const {
-      target: {
-        files: [file],
-      },
-    } = e;
-
-    // 'if (file)...' to avoid code breaks when the user cancels the upload, after a previous upload already happened.
-    if (file) {
-      const { size } = file;
+    setLoadedFiles([]); // Clear state with each new upload.
+    Object.keys(e.target.files).forEach((n) => {
+      const file = e.target.files[n];
+      const size = e.target.files[n].size;
       size <= 2097152 // Example 2mb file size limit, before the rest of the validation proceeds.
-        ? handleFiles(file, setLoadedFile)
+        ? handleFiles(file, setLoadedFiles)
         : console.warn("File size too big.");
-    }
+    });
   };
 
   // A simulated fake fetch() that also converts to Base64.
   const fakeFetch = (e: any) => {
     e.preventDefault();
-    convertFetch(fileObject);
+
+    if (loadedFiles.length > 0) { // If any files are uploaded.
+      loadedFiles.forEach((mappedFile: any) => {
+        convertFetch(mappedFile.fileObject);
+      });
+    } else { // If no files are uploaded.
+      convertFetch(undefined);
+    }
   };
 
   return (
@@ -44,36 +45,46 @@ const Home: NextPage = () => {
           name="fileInput"
           accept=".png, .jpg, .jpeg, .gif, .bmp, .svg, .pdf, .tif, .webp, .doc, .docx, .odt, .txt, .rtf" // Changing this field also requires updating '/components/handleFiles.tsx' accordingly.
           onChange={handleUpload}
+          multiple
         />
         <input type="submit" />
       </form>
 
-      {imageFiles.includes(type) && (
-        <Image
-          width={300}
-          height={200}
-          src={URL.createObjectURL(fileObject)}
-          alt={"Some image"}
-        />
-      )}
+      {loadedFiles.map((mappedFile: any) => {
+        const singleFile = mappedFile.fileObject;
+        const singleFileType = mappedFile.type;
 
-      {documentFiles.includes(type) && (
-        <embed
-          src={URL.createObjectURL(fileObject)}
-          width="375"
-          height="500"
-          type={type}
-        />
-      )}
+        return (
+          <div key={singleFile.name}>
+            {imageFiles.includes(singleFileType) && (
+              <Image
+                width={300}
+                height={200}
+                src={URL.createObjectURL(singleFile)}
+                alt={"Some image"}
+              />
+            )}
 
-      {(unsupportedFiles.includes(type) ||
-        type === "image/tiff" || // *.tif files.
-        type === "application/vnd.oasis.opendocument.text") && ( // *.odt files.
-        <p>
-          The file is loaded, but the browser does not support in natively
-          displaying it.
-        </p>
-      )}
+            {documentFiles.includes(singleFileType) && (
+              <embed
+                src={URL.createObjectURL(singleFile)}
+                width="375"
+                height="500"
+                type={singleFileType}
+              />
+            )}
+
+            {(unsupportedFiles.includes(singleFileType) ||
+              singleFileType === "image/tiff" || // *.tif files.
+              singleFileType === "application/vnd.oasis.opendocument.text") && ( // *.odt files.
+              <p>
+                The file is loaded, but the browser does not support in natively
+                displaying it.
+              </p>
+            )}
+          </div>
+        );
+      })}
     </>
   );
 };

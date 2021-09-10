@@ -1,6 +1,6 @@
 ## General Purpose React.js / Next.js File Uploader
 
-This is a simple (no visual design or even basic CSS) React.js / Next.js general purpose component to upload, display and send files as part of a form (or without a form).
+This is a simple (no visual design or even basic CSS) React.js / Next.js general purpose component to upload, display and send multiple files as part of a form (or without a form).
 
 It's based on the code I initially wrote [here](https://github.com/O-K-G/polykick/blob/main/client/src/components/userPosts.js) (handleChange() with reader.readAsDataURL()).
 
