@@ -1,7 +1,10 @@
 import type { NextPage } from "next";
 import React, { useState } from "react";
 import Image from "next/image";
-import handleFiles, { fileTypes } from "../components/handleFiles"; // Handles the actually uploaded files.
+import handleFiles, {
+  fileTypes,
+  convertFetch,
+} from "../components/handleFiles"; // Handles the actually uploaded files.
 
 const Home: NextPage = () => {
   const [loadedFile, setLoadedFile] = useState<any>(false);
@@ -24,29 +27,10 @@ const Home: NextPage = () => {
     }
   };
 
-  // A simulated fake fetch().
+  // A simulated fake fetch() that also converts to Base64.
   const fakeFetch = (e: any) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("firstName", "John");
-
-    ///////// Start of uploaded file Base64 conversion. \\\\\\\\\\
-
-    const reader: any = new FileReader();
-
-    // 'fileObject && ...' is to avoid code breaks when the user hits 'Submit' without uploading a file.
-    fileObject && reader.readAsDataURL(fileObject); // Convert the file to a Base64 encoding.
-    reader.onload = () => {
-      const { result } = reader; // To remove the base64 header from the string, add 'result.split(",").pop()'.
-
-      ///////// End of uploaded file Base64 conversion. \\\\\\\\\\
-
-      formData.append("file", result); // Switch 'result' to 'fileObject' if you need the unconverted file.
-      console.log(formData.getAll("file"));
-    };
-    console.log(formData.getAll("firstName"));
-
-    URL.revokeObjectURL(fileObject); // Needed once the URL object isn't needed anymore. For cleanup purposes.
+    convertFetch(fileObject);
   };
 
   return (
