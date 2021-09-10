@@ -4,11 +4,7 @@ This is a simple (no visual design or even basic CSS) React.js / Next.js general
 
 It's based on the code I initially wrote [here](https://github.com/O-K-G/polykick/blob/main/client/src/components/userPosts.js) (handleChange() with reader.readAsDataURL()).
 
-I always felt that 'readAsDataURL()' required too much unnecessary workarounds just to be able to "properly" display, send, store and retrieve blobs. Things like conversions to 'base64' back and forth, using slice() on the strings and whatnot. The more you convert, the more prone to errors the whole process is. Either way, this 'readAsDataURL()' solution is just a partial solution for only some file types.
-
-So instead of 'readAsDataURL()', this project is using 'URL.createObjectURL()'.
-'URL.createObjectURL()' doesn't need the previous unnecessary code and conversions, and it allows a more simple display of uploaded files.
-'FormData()' is there just for an easier collection of form fields keys and values.
+This time it's used mostly with 'URL.createObjectURL()', which performs much better.
 
 The form is available [here](https://github.com/O-K-G/react-files-upload/blob/main/pages/index.tsx).
 The component is available [here](https://github.com/O-K-G/react-files-upload/blob/main/components/handleFiles.tsx).

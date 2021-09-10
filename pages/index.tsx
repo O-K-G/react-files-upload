@@ -5,9 +5,9 @@ import handleFiles, { fileTypes } from "../components/handleFiles"; // Handles t
 
 const Home: NextPage = () => {
   const [loadedFile, setLoadedFile] = useState<any>(false);
-  const { name, type, blob, base64String } = loadedFile;
+  const { fileObject, type } = loadedFile;
   const { imageFiles, documentFiles, unsupportedFiles } = fileTypes;
-const [t, setT] = useState(false);
+
   const handleUpload = (e: any) => {
     const {
       target: {
@@ -15,25 +15,39 @@ const [t, setT] = useState(false);
       },
     } = e;
 
-    setT(file);
-    file && handleFiles(file, setLoadedFile); // "file && ..." is to avoid code breaks when the user cancels the upload.
+    // 'if (file)...' to avoid code breaks when the user cancels the upload, after a previous upload already happened.
+    if (file) {
+      const { size } = file;
+      size <= 2097152 // Example 2mb file size limit, before the rest of the validation proceeds.
+        ? handleFiles(file, setLoadedFile)
+        : console.warn("File size too big.");
+    }
   };
 
-  // Simulate a fake fetch().
+  // A simulated fake fetch().
   const fakeFetch = (e: any) => {
-    const file = e.target.fileInput.files[0];
-    
     e.preventDefault();
     const formData = new FormData();
     formData.append("firstName", "John");
-    formData.append("file", file);
-    console.log(formData.getAll("firstName"));
-    console.log(formData.getAll("file"));
-    console.log(base64String);
-    console.log(file);
-  };
 
-  // Add 'URL.revokeObjectURL(blobURL);' at a stage when the object isn't needed anymore.
+    ///////// Start of uploaded file Base64 conversion. \\\\\\\\\\
+
+    const reader: any = new FileReader();
+
+    // 'fileObject && ...' is to avoid code breaks when the user hits 'Submit' without uploading a file.
+    fileObject && reader.readAsDataURL(fileObject); // Convert the file to a Base64 encoding.
+    reader.onload = () => {
+      const { result } = reader; // To remove the base64 header from the string, add 'result.split(",").pop()'.
+
+      ///////// End of uploaded file Base64 conversion. \\\\\\\\\\
+
+      formData.append("file", result); // Switch 'base64String' to 'fileObject' if you need the unconverted file.
+      console.log(formData.getAll("file"));
+    };
+    console.log(formData.getAll("firstName"));
+
+    URL.revokeObjectURL(fileObject); // Needed once the URL object isn't needed anymore for cleanup.
+  };
 
   return (
     <>
@@ -44,7 +58,7 @@ const [t, setT] = useState(false);
           type="file"
           id="file"
           name="fileInput"
-          accept=".png, .jpg, .jpeg, .gif, .bmp, .svg, .pdf, .tif, .webp, .doc, .docx, .odt" // Changing this field also requires updating '/components/handleFiles.tsx' accordingly.
+          accept=".png, .jpg, .jpeg, .gif, .bmp, .svg, .pdf, .tif, .webp, .doc, .docx, .odt, .txt, .rtf" // Changing this field also requires updating '/components/handleFiles.tsx' accordingly.
           onChange={handleUpload}
         />
         <input type="submit" />
@@ -54,14 +68,14 @@ const [t, setT] = useState(false);
         <Image
           width={300}
           height={200}
-          src={URL.createObjectURL(t)}
+          src={URL.createObjectURL(fileObject)}
           alt={"Some image"}
         />
       )}
 
       {documentFiles.includes(type) && (
         <embed
-          src={URL.createObjectURL(blob)}
+          src={URL.createObjectURL(fileObject)}
           width="375"
           height="500"
           type={type}
