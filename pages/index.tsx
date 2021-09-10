@@ -12,9 +12,13 @@ const Home: NextPage = () => {
 
   const handleUpload = (e: any) => {
     setLoadedFiles([]); // Clear state with each new upload.
-    Object.keys(e.target.files).forEach((n) => {
-      const file = e.target.files[n];
-      const size = e.target.files[n].size;
+    const {
+      target: { files },
+    } = e;
+    Object.keys(files).forEach((n) => {
+      const file = files[n];
+      const { size } = files[n];
+
       size <= 2097152 // Example 2mb file size limit, before the rest of the validation proceeds.
         ? handleFiles(file, setLoadedFiles)
         : console.warn("File size too big.");
@@ -24,14 +28,7 @@ const Home: NextPage = () => {
   // A simulated fake fetch() that also converts to Base64.
   const fakeFetch = (e: any) => {
     e.preventDefault();
-
-    if (loadedFiles.length > 0) { // If any files are uploaded.
-      loadedFiles.forEach((mappedFile: any) => {
-        convertFetch(mappedFile.fileObject);
-      });
-    } else { // If no files are uploaded.
-      convertFetch(undefined);
-    }
+    convertFetch(loadedFiles);
   };
 
   return (
@@ -50,33 +47,34 @@ const Home: NextPage = () => {
         <input type="submit" />
       </form>
 
-      {loadedFiles.map((mappedFile: any) => {
-        const singleFile = mappedFile.fileObject;
-        const singleFileType = mappedFile.type;
+      {loadedFiles.map((file: any) => {
+        const { fileObject } = file;
+        const { name } = fileObject;
+        const { type } = file;
 
         return (
-          <div key={singleFile.name}>
-            {imageFiles.includes(singleFileType) && (
+          <div key={name}>
+            {imageFiles.includes(type) && (
               <Image
                 width={300}
                 height={200}
-                src={URL.createObjectURL(singleFile)}
+                src={URL.createObjectURL(fileObject)}
                 alt={"Some image"}
               />
             )}
 
-            {documentFiles.includes(singleFileType) && (
+            {documentFiles.includes(type) && (
               <embed
-                src={URL.createObjectURL(singleFile)}
+                src={URL.createObjectURL(fileObject)}
                 width="375"
                 height="500"
-                type={singleFileType}
+                type={type}
               />
             )}
 
-            {(unsupportedFiles.includes(singleFileType) ||
-              singleFileType === "image/tiff" || // *.tif files.
-              singleFileType === "application/vnd.oasis.opendocument.text") && ( // *.odt files.
+            {(unsupportedFiles.includes(type) ||
+              type === "image/tiff" || // *.tif files.
+              type === "application/vnd.oasis.opendocument.text") && ( // *.odt files.
               <p>
                 The file is loaded, but the browser does not support in natively
                 displaying it.

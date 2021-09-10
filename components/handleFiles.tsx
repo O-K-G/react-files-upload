@@ -23,38 +23,40 @@ const handleFiles = (file: any, setLoadedFile: any) => {
   documentFiles.includes(type) ||
   unsupportedFiles.includes(fileExtension)
     ? setLoadedFile((prevValue: any) => [
-          ...prevValue,
+        ...prevValue,
         { fileObject: file, type: type ? type : fileExtension },
       ])
     : console.warn("Incorrect file type, please choose a correct file type.");
 };
 
 // A simulated fake fetch().
-const convertFetch = (fileObject: any) => {
+const convertFetch = (loadedFiles: any) => {
   const formData = new FormData();
   formData.append("firstName", "John");
 
-  // Start of uploaded file Base64 conversion.
+  loadedFiles.forEach((file: any) => {
+    const { fileObject } = file;
 
-  const reader: any = new FileReader();
+    // Start of uploaded file Base64 conversion.
+    const reader: any = new FileReader();
 
-  // 'fileObject && ...' is to avoid code breaks when the user hits 'Submit' without uploading a file.
-  fileObject && reader.readAsDataURL(fileObject); // Convert the file to a Base64 encoding.
-  reader.onload = () => {
-    const { result } = reader; // To remove the base64 header from the string, add 'result.split(",").pop()'.
+    // 'fileObject && ...' is to avoid code breaks when the user hits 'Submit' without uploading a file.
+    fileObject && reader.readAsDataURL(fileObject); // Convert the file to a Base64 encoding.
+    reader.onload = () => {
+      const { result } = reader; // To remove the base64 header from the string, add 'result.split(",").pop()'.
 
-    // End of uploaded file Base64 conversion.
+      // End of uploaded file Base64 conversion.
 
-    formData.append("file", result); // Switch 'result' to 'fileObject' if you need the unconverted file.
-    console.log(formData.getAll("file"));
-  };
+      formData.append("file", result); // Switch 'result' to 'fileObject' if you need the unconverted file.
+      console.log(formData.getAll("file"));
+    };
+
+    reader.onerror = () => {
+      console.error("Failed to read file!");
+    };
+    URL.revokeObjectURL(fileObject); // Needed once the URL object isn't needed anymore. For cleanup purposes.
+  });
   console.log(formData.getAll("firstName"));
-
-  reader.onerror = () => {
-    console.error("Failed to read file!");
-  };
-
-  URL.revokeObjectURL(fileObject); // Needed once the URL object isn't needed anymore. For cleanup purposes.
 };
 
 export { convertFetch };
