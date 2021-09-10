@@ -41,12 +41,12 @@ const Home: NextPage = () => {
 
       ///////// End of uploaded file Base64 conversion. \\\\\\\\\\
 
-      formData.append("file", result); // Switch 'base64String' to 'fileObject' if you need the unconverted file.
+      formData.append("file", result); // Switch 'result' to 'fileObject' if you need the unconverted file.
       console.log(formData.getAll("file"));
     };
     console.log(formData.getAll("firstName"));
 
-    URL.revokeObjectURL(fileObject); // Needed once the URL object isn't needed anymore for cleanup.
+    URL.revokeObjectURL(fileObject); // Needed once the URL object isn't needed anymore. For cleanup purposes.
   };
 
   return (
